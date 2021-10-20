@@ -1,5 +1,3 @@
-//#pragma warning(disable : 4996)
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,19 +12,30 @@ typedef struct {
 
 int ucitajBrojRedakaIzDatoteke(char* imeDatoteke);
 student* alocirajIProcitajIzDatoteke(char* imeDatoteke, int brojRedaka);
+int izracunajMaksimalniOstvareniBrojBodova(student* studenti, int brojStudenata);
+void ispisiStudente(student* studenti, int brojStudenata, int maksimalniBrojBodova);
 
 int main() {
 	int brojRedaka = 0;
 	student* studenti = NULL;
+	int maksimalniBrojBodova = 0;
 
 	brojRedaka = ucitajBrojRedakaIzDatoteke("studenti.txt");
 
-    if (brojRedaka == -1)
+    if (brojRedaka == -1 || brojRedaka == 0)
     {
         return 0;
     }
 
 	studenti = alocirajIProcitajIzDatoteke("studenti.txt", brojRedaka);
+
+	if (studenti == NULL){
+		return 0;
+	}
+
+	maksimalniBrojBodova = izracunajMaksimalniOstvareniBrojBodova(studenti, brojRedaka);
+
+	ispisiStudente(studenti, brojRedaka, maksimalniBrojBodova);
 }
 
 int ucitajBrojRedakaIzDatoteke(char* imeDatoteke) {
@@ -72,10 +81,36 @@ student* alocirajIProcitajIzDatoteke(char* imeDatoteke, int brojRedaka) {
 	}
 
 	while (!feof(datoteka)) {
-		fscanf(datoteka, " %s %s %lf", studenti[brojac].ime, studenti[brojac].prezime, studenti[brojac].bodovi);
+		fscanf(datoteka, " %s %s %lf", studenti[brojac].ime, studenti[brojac].prezime, &studenti[brojac].bodovi);
 		brojac++;
 	}
+
+	fclose(datoteka);
 
 	return studenti;
 }
 
+int izracunajMaksimalniOstvareniBrojBodova(student* studenti, int brojStudenata){
+	int maksimalniBrojBodova = 0;
+	int i = 0;
+
+	for (i = 0; i < brojStudenata; i++){
+		if (studenti[i].bodovi > maksimalniBrojBodova){
+			maksimalniBrojBodova = studenti[i].bodovi;
+		}
+	}
+
+	return maksimalniBrojBodova;
+}
+
+void ispisiStudente(student* studenti, int brojStudenata, int maksimalniBrojBodova){
+	int i = 0;
+
+	printf("IME\t PREZIME\t APS. BROJ BODOVA\t REL. BROJ BODOVA\n");
+
+
+	for (i = 0; i < brojStudenata; i++){
+		printf("%s\t %s\t\t %lf\t\t %lf\n", studenti[i].ime, studenti[i].prezime, studenti[i].bodovi, (double)studenti[i].bodovi/(double)maksimalniBrojBodova*100);
+	}
+
+}
