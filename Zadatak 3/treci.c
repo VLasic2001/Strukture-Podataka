@@ -3,6 +3,7 @@
 #include <string.h>
 
 #define MAX_SIZE (50)
+#define MAX_LINE 1024
 
 struct _Person;
 typedef struct _Person* Position;
@@ -28,6 +29,7 @@ Position FindPersonBefore(Position first, char* surname);
 int InsertPersonBeforeSearched(Position head, char* name, char* surname, int birthYear, char* search);
 int SortList(Position head);
 int PrintListToFile(Position first, char* fileName);
+int ReadListFromFile(Position head, char* fileName, char* name, char* surname, int* birthYear);
 
 int main(int argc, char** argv)
 {
@@ -60,6 +62,7 @@ void PrintAndHandleMenu(Position p)
                 "7 - Add a new person before a person by search\n"
                 "8 - Sort list\n"
                 "9 - Print list to file\n"
+                "10 - Read list from file\n"
                 "0 - End program\n");
         scanf("%d", &choice);
 
@@ -144,6 +147,9 @@ void PrintAndHandleMenu(Position p)
             break;
         case 9:
             PrintListToFile(p->next, "osobe.txt");
+            break;
+        case 10:
+            ReadListFromFile(p, "osobe.txt", name, surname, &birthYear);
             break;
         case 0:
             break;
@@ -413,6 +419,36 @@ int PrintListToFile(Position first, char* fileName)
     
         temp = temp->next;
     }
+
+    fclose(file);
+
+    return EXIT_SUCCESS;
+}
+
+int ReadListFromFile(Position head, char* fileName, char* name, char* surname, int* birthYear)
+{
+    Position temp = head;
+    FILE* file = NULL;
+    char buffer[MAX_LINE] = { 0 };
+    Position newPerson = NULL;
+
+    file = fopen(fileName, "r");
+
+    if(feof(file))
+    {
+        return -1;
+    }
+
+    do
+    {
+        fgets(buffer, MAX_LINE, file);
+        if (sscanf(buffer, "%s %s %d", name, surname, birthYear) == 3)
+        {
+            newPerson = CreatePerson(name, surname, *birthYear);
+            InsertAfter(head, newPerson);
+        }
+    }
+    while(!feof(file));
 
     fclose(file);
 
