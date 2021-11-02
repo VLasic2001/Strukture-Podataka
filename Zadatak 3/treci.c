@@ -57,7 +57,7 @@ void PrintAndHandleMenu(Position p)
                 "5 - Delete a person by surname\n"
                 "6 - Add a new person after a person by search\n"
                 "7 - Add a new person before a person by search\n"
-                "8 - Sortiraj listu\n"
+                "8 - Sort list\n"
                 "0 - End program\n");
         scanf("%d", &choice);
 
@@ -136,6 +136,9 @@ void PrintAndHandleMenu(Position p)
             scanf(" %s", search);
             InputAndSetPersonInfo(name, surname, &birthYear);
             InsertPersonBeforeSearched(p, name, surname, birthYear, search);
+            break;
+        case 8:
+            SortList(p);
             break;
         case 0:
             break;
@@ -355,5 +358,37 @@ int InsertPersonBeforeSearched(Position head, char* name, char* surname, int bir
 
 int SortList(Position head)
 {
-    
+        Position current = head->next;
+        Position next = current->next;
+        Position previous = head;
+        int done = 0;
+
+        do
+        {
+            current = head->next;
+            next = current->next;
+            previous = head;
+            done = 0;
+            while(next != NULL) {
+                if (strcmp(current->surname, next->surname) > 0) 
+                {
+                    previous->next = next;
+                    current->next = next->next;
+                    next->next = current; 
+
+                    previous = next;
+                    next = current->next;
+
+                    done = 1;
+                }
+                else 
+                {
+                    previous = current;
+                    current = current->next;
+                    next = current->next;
+                }
+            }
+            printf("%d\n", done);
+        }
+        while(done);
 }
