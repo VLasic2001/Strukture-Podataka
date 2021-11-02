@@ -165,7 +165,7 @@ Position CreatePerson(char* name, char* surname, int birthYear)
 {
     Position newPerson = NULL;
 
-    newPerson = (Position)malloc(sizeof(Position));
+    newPerson = (Position)malloc(sizeof(Person));
     if (!newPerson)
     {
         perror("Can't allocate memory!\n");

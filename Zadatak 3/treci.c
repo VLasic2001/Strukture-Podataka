@@ -26,6 +26,7 @@ int DeletePerson(Position head, char* surname);
 int InsertPersonAfterSearched(Position head, char* name, char* surname, int birthYear, char* search);
 Position FindPersonBefore(Position first, char* surname);
 int InsertPersonBeforeSearched(Position head, char* name, char* surname, int birthYear, char* search);
+int SortList(Position head);
 
 int main(int argc, char** argv)
 {
@@ -56,6 +57,7 @@ void PrintAndHandleMenu(Position p)
                 "5 - Delete a person by surname\n"
                 "6 - Add a new person after a person by search\n"
                 "7 - Add a new person before a person by search\n"
+                "8 - Sortiraj listu\n"
                 "0 - End program\n");
         scanf("%d", &choice);
 
@@ -194,7 +196,7 @@ Position CreatePerson(char* name, char* surname, int birthYear)
 {
     Position newPerson = NULL;
 
-    newPerson = (Position)malloc(sizeof(Position));
+    newPerson = (Position)malloc(sizeof(Person));
     if (!newPerson)
     {
         perror("Can't allocate memory!\n");
@@ -349,4 +351,9 @@ int InsertPersonBeforeSearched(Position head, char* name, char* surname, int bir
     InsertAfter(temp, newPerson);
 
     return EXIT_SUCCESS;
+}
+
+int SortList(Position head)
+{
+    
 }
