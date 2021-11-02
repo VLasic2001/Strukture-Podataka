@@ -3,6 +3,7 @@
 #include <string.h>
 
 #define MAX_SIZE (50)
+#define MAX_LINE 1024
 
 struct _Person;
 typedef struct _Person* Position;
@@ -23,6 +24,12 @@ Position FindLast(Position head);
 int AppendList(Position head, char* name, char* surname, int birthYear);
 Position FindPerson(Position first, char* surname);
 int DeletePerson(Position head, char* surname);
+int InsertPersonAfterSearched(Position head, char* name, char* surname, int birthYear, char* search);
+Position FindPersonBefore(Position first, char* surname);
+int InsertPersonBeforeSearched(Position head, char* name, char* surname, int birthYear, char* search);
+int SortList(Position head);
+int PrintListToFile(Position first, char* fileName);
+int ReadListFromFile(Position head, char* fileName, char* name, char* surname, int* birthYear);
 
 int main(int argc, char** argv)
 {
@@ -51,6 +58,11 @@ void PrintAndHandleMenu(Position p)
                 "3 - Add a new person to the end of the list\n"
                 "4 - Find a person by surname\n"
                 "5 - Delete a person by surname\n"
+                "6 - Add a new person after a person by search\n"
+                "7 - Add a new person before a person by search\n"
+                "8 - Sort list\n"
+                "9 - Print list to file\n"
+                "10 - Read list from file\n"
                 "0 - End program\n");
         scanf("%d", &choice);
 
@@ -92,6 +104,7 @@ void PrintAndHandleMenu(Position p)
                 printf("There are no people in the list\n");
                 break;
             }
+            printf("Enter the surname of the person you want to search: \n");
             scanf(" %s", search);
             searchPosition = FindPerson(p->next, search);
             printf("Searched person is %s %s, birth year: %d\n", searchPosition->name, searchPosition->surname, searchPosition->birthYear);
@@ -103,8 +116,40 @@ void PrintAndHandleMenu(Position p)
                 printf("There are no people in the list\n");
                 break;
             }
+            printf("Enter the surname of the person you want to search: \n");
             scanf(" %s", search);
             DeletePerson(p, search);
+            break;
+        case 6:
+            if (p->next == NULL)
+            {
+                printf("There are no people in the list\n");
+                break;
+            }
+            printf("Enter the surname of the person you want to search: \n");
+            scanf(" %s", search);
+            InputAndSetPersonInfo(name, surname, &birthYear);
+            InsertPersonAfterSearched(p, name, surname, birthYear, search);
+            break;
+        case 7:
+            if (p->next == NULL)
+            {
+                printf("There are no people in the list\n");
+                break;
+            }
+            printf("Enter the surname of the person you want to search: \n");
+            scanf(" %s", search);
+            InputAndSetPersonInfo(name, surname, &birthYear);
+            InsertPersonBeforeSearched(p, name, surname, birthYear, search);
+            break;
+        case 8:
+            SortList(p);
+            break;
+        case 9:
+            PrintListToFile(p->next, "osobe.txt");
+            break;
+        case 10:
+            ReadListFromFile(p, "osobe.txt", name, surname, &birthYear);
             break;
         case 0:
             break;
@@ -263,4 +308,148 @@ int DeletePerson(Position head, char* surname)
     }
 
     return 0;
+}
+
+int InsertPersonAfterSearched(Position head, char* name, char* surname, int birthYear, char* search)
+{
+    Position temp = head;
+    Position newPerson = NULL;
+
+    temp = FindPerson(head->next, search);
+    
+    if (!temp)
+    {
+        return -1;
+    }
+
+    newPerson = CreatePerson(name, surname, birthYear);
+
+    InsertAfter(temp, newPerson);
+
+    return EXIT_SUCCESS;
+}
+
+Position FindPersonBefore(Position head, char* search)
+{
+    Position temp = head;
+
+    while (temp->next)
+    {
+        if (strcmp(temp->next->surname, search) == 0)
+        {
+            return temp;
+        }
+        else
+        {
+            temp = temp->next;
+        }
+    }
+
+    return NULL;
+}
+
+int InsertPersonBeforeSearched(Position head, char* name, char* surname, int birthYear, char* search)
+{
+    Position temp = head;
+    Position newPerson = NULL;
+
+    temp = FindPersonBefore(head, search);
+
+    if (!temp)
+    {
+        return -1;
+    }
+
+    newPerson = CreatePerson(name, surname, birthYear);
+    newPerson->next = temp->next;
+    InsertAfter(temp, newPerson);
+
+    return EXIT_SUCCESS;
+}
+
+int SortList(Position head)
+{
+        Position current = head->next;
+        Position next = current->next;
+        Position previous = head;
+        int done = 0;
+
+        do
+        {
+            current = head->next;
+            next = current->next;
+            previous = head;
+            done = 0;
+            while(next != NULL) {
+                if (strcmp(current->surname, next->surname) > 0) 
+                {
+                    previous->next = next;
+                    current->next = next->next;
+                    next->next = current; 
+
+                    previous = next;
+                    next = current->next;
+
+                    done = 1;
+                }
+                else 
+                {
+                    previous = current;
+                    current = current->next;
+                    next = current->next;
+                }
+            }
+        }
+        while(done);
+
+    return 0;
+}
+
+int PrintListToFile(Position first, char* fileName)
+{
+    Position temp = first;
+    FILE* file = NULL;
+
+    file = fopen(fileName, "w");
+
+    while(temp)
+    {
+        fprintf(file, "%s %s %d\n", temp->name, temp->surname, temp->birthYear);
+    
+        temp = temp->next;
+    }
+
+    fclose(file);
+
+    return EXIT_SUCCESS;
+}
+
+int ReadListFromFile(Position head, char* fileName, char* name, char* surname, int* birthYear)
+{
+    Position temp = head;
+    FILE* file = NULL;
+    char buffer[MAX_LINE] = { 0 };
+    Position newPerson = NULL;
+
+    file = fopen(fileName, "r");
+
+    if(feof(file))
+    {
+        return -1;
+    }
+
+    do
+    {
+        fgets(buffer, MAX_LINE, file);
+        if (sscanf(buffer, "%s %s %d", name, surname, birthYear) == 3)
+        {
+            newPerson = CreatePerson(name, surname, *birthYear);
+            InsertAfter(head, newPerson);
+        }
+    }
+    while(!feof(file));
+
+    fclose(file);
+
+    return EXIT_SUCCESS;
 }
