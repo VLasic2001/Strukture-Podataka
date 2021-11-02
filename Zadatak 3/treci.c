@@ -27,6 +27,7 @@ int InsertPersonAfterSearched(Position head, char* name, char* surname, int birt
 Position FindPersonBefore(Position first, char* surname);
 int InsertPersonBeforeSearched(Position head, char* name, char* surname, int birthYear, char* search);
 int SortList(Position head);
+int PrintListToFile(Position first, char* fileName);
 
 int main(int argc, char** argv)
 {
@@ -58,6 +59,7 @@ void PrintAndHandleMenu(Position p)
                 "6 - Add a new person after a person by search\n"
                 "7 - Add a new person before a person by search\n"
                 "8 - Sort list\n"
+                "9 - Print list to file\n"
                 "0 - End program\n");
         scanf("%d", &choice);
 
@@ -139,6 +141,9 @@ void PrintAndHandleMenu(Position p)
             break;
         case 8:
             SortList(p);
+            break;
+        case 9:
+            PrintListToFile(p->next, "osobe.txt");
             break;
         case 0:
             break;
@@ -391,4 +396,25 @@ int SortList(Position head)
             printf("%d\n", done);
         }
         while(done);
+
+    return 0;
+}
+
+int PrintListToFile(Position first, char* fileName)
+{
+    Position temp = first;
+    FILE* file = NULL;
+
+    file = fopen(fileName, "w");
+
+    while(temp)
+    {
+        fprintf(file, "%s %s %d\n", temp->name, temp->surname, temp->birthYear);
+    
+        temp = temp->next;
+    }
+
+    fclose(file);
+
+    return EXIT_SUCCESS;
 }
