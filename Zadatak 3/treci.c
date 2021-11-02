@@ -399,7 +399,6 @@ int SortList(Position head)
                     next = current->next;
                 }
             }
-            printf("%d\n", done);
         }
         while(done);
 
