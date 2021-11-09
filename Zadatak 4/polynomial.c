@@ -64,6 +64,11 @@ int InsertExponentSorted(Position numberHead, int coefficient, int exponent)
         return EXIT_FAILURE;
     }
 
+    if (coefficient == 0)
+    {
+        return EXIT_SUCCESS;
+    }
+
     newExponent->coefficient = coefficient;
     newExponent->exponent = exponent;
     newExponent->next = NULL;
@@ -120,10 +125,7 @@ int AddPolynomials(Position firstNumberHead, Position secondNumberHead, Position
     {
         if (temp1->exponent == temp2->exponent)
         {
-            if (temp1->coefficient+temp2->coefficient != 0)
-            {
-                InsertExponentSorted(resultHead, (temp1->coefficient+temp2->coefficient), temp1->exponent);
-            }
+            InsertExponentSorted(resultHead, (temp1->coefficient+temp2->coefficient), temp1->exponent);
 
             temp1 = temp1->next;
             temp2 = temp2->next;
@@ -162,6 +164,20 @@ int AddPolynomials(Position firstNumberHead, Position secondNumberHead, Position
     }
 }
 
+int MultiplyPolynomials(Position firstNumberHead, Position secondNumberHead, Position resultHead)
+{
+    Position temp1 = NULL;
+    Position temp2 = NULL;
+    Position tempResult = resultHead;
+
+    for (temp1 = firstNumberHead->next; temp1; temp1 = temp1->next)
+    {
+        for (temp2 = secondNumberHead->next; temp2; temp2 = temp2->next)
+        {
+            InsertExponentSorted(tempResult, temp1->coefficient*temp2->coefficient, temp1->exponent+temp2->exponent);
+        } 
+    }
+}
 
 int PrintNumber(Position numberHead)
 {
