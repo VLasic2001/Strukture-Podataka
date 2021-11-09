@@ -32,12 +32,19 @@ int ReadNumber(char* fileName, Position numberHead, int rowNumber)
 
     do
     {
-        sscanf(bufferPtr, " %d %d %n", &coefficient, &exponent, &size);
-       
-        InsertExponentSorted(numberHead, coefficient, exponent);
+        if(sscanf(bufferPtr, " %d %d %n", &coefficient, &exponent, &size) == 2)
+        {
+            InsertExponentSorted(numberHead, coefficient, exponent);
 
-        bufferPtr += size;
-    } while (strlen(bufferPtr) > 0 && !feof(file));
+            bufferPtr += size;  
+        }
+        else
+        {
+            printf("File isn't in the correct format\n");
+            break;
+        }
+        
+    } while (strlen(bufferPtr) > 0);
 
     fclose(file);
 
@@ -103,10 +110,71 @@ int InsertExponentSorted(Position numberHead, int coefficient, int exponent)
     }
 }
 
+int AddPolynomials(Position firstNumberHead, Position secondNumberHead, Position resultHead)
+{
+    Position temp1 = firstNumberHead->next;
+    Position temp2 = secondNumberHead->next;
+    Position tempResult = resultHead;
+
+    while (temp1 && temp2)
+    {
+        if (temp1->exponent == temp2->exponent)
+        {
+            if (temp1->coefficient+temp2->coefficient != 0)
+            {
+                InsertExponentSorted(resultHead, (temp1->coefficient+temp2->coefficient), temp1->exponent);
+            }
+
+            temp1 = temp1->next;
+            temp2 = temp2->next;
+        }
+        else if (temp1->exponent > temp2->exponent || !temp2)
+        {
+            InsertExponentSorted(resultHead, temp1->coefficient, temp1->exponent);
+
+            temp1 = temp1->next;
+        }
+        else
+        {
+            InsertExponentSorted(resultHead, temp2->coefficient, temp2->exponent);
+
+            temp2 = temp2->next;
+        }
+    }
+
+    if (!temp2)
+    {
+        while(temp1)
+        {
+            InsertExponentSorted(resultHead, temp1->coefficient, temp1->exponent);
+
+            temp1 = temp1->next;
+        }
+    }
+    else
+    {
+        while(temp2)
+        {
+            InsertExponentSorted(resultHead, temp2->coefficient, temp2->exponent);
+
+            temp2 = temp2->next;
+        }
+    }
+}
+
 
 int PrintNumber(Position numberHead)
 {
     Position temp = numberHead->next;
+
+    if (temp)
+    {
+        printf("%s", temp->coefficient >= 0 ? "" : "-");
+    }
+    else
+    {
+        printf("0");
+    }
 
     while(temp)
     {
@@ -126,14 +194,7 @@ int PrintNumber(Position numberHead)
 
         if (temp->next)
         {
-            if (temp->next->coefficient > 0)
-            {
-                printf(" + ");
-            }
-            else if (temp->next->coefficient < 0)
-            {
-                printf(" - ");
-            }
+            printf(" %s ", temp->next->coefficient > 0 ? "+" : "-");
         }
 
         temp = temp->next;

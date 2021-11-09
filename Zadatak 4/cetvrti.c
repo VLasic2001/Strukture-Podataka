@@ -13,15 +13,20 @@ int main()
 
     Position pNumber1 = &head1;
     Position pNumber2 = &head2;
-    Position pAdditionResultNumber = &head2;
+    Position pAdditionResultNumber = &additionResultHead;
 
     ReadNumber("polinomi.txt", pNumber1, 1);
     ReadNumber("polinomi.txt", pNumber2, 2);
 
+    printf("Prvi broj: ");
     PrintNumber(pNumber1);
+    printf("Drugi broj: ");
     PrintNumber(pNumber2);
 
-    
+    AddPolynomials(pNumber1, pNumber2, pAdditionResultNumber);
+
+    printf("Rezultat zbrajanja polinoma: ");
+    PrintNumber(pAdditionResultNumber);
 
     return EXIT_SUCCESS;
 }
